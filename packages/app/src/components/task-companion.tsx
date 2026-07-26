@@ -9,6 +9,7 @@ import { useSettings } from "@/context/settings"
 import { usePlatform } from "@/context/platform"
 import {
   clampCompanionPosition,
+  companionCards,
   companionLookDirection,
   companionProgress,
   companionResult,
@@ -161,7 +162,10 @@ export function TaskCompanion() {
   })
   const visibleSessions = createMemo(() => sessions().filter((session) => !dismissed[session.id]))
   const cards = createMemo(() =>
-    (visibleSessions().length ? visibleSessions() : allSessions().filter((session) => !dismissed[session.id])).slice(0, 12),
+    companionCards(
+      visibleSessions(),
+      allSessions().filter((session) => !dismissed[session.id]),
+    ),
   )
   const lead = createMemo(() => visibleSessions()[0])
   const progress = createMemo(() => companionProgress(sync().session.data.todo[lead()?.id ?? ""] ?? []))
@@ -192,6 +196,12 @@ export function TaskCompanion() {
       animations: settings.companion.animations(),
       scale: settings.companion.scale(),
       leadState: active?.state ?? "idle",
+      labels: {
+        idle: language.t("companion.idle"),
+        dismiss: language.t("companion.dismiss"),
+        move: language.t("companion.move"),
+        settings: language.t("companion.settings"),
+      },
       sessions: cards().map((session) => {
         const description =
           (session.id === active?.id ? progress().current : result(session.id)) ??
@@ -326,7 +336,7 @@ export function TaskCompanion() {
                     <button
                       type="button"
                       class="task-companion-dismiss mr-3 shrink-0 size-7 rounded-full text-14-medium focus-visible:outline-2"
-                      aria-label="Chat ausblenden"
+                      aria-label={language.t("companion.dismiss")}
                       onClick={() => setDismissed(session.id, true)}
                     >
                       <span class="task-companion-dismiss-idle" aria-hidden="true">○</span>

@@ -24,6 +24,12 @@ export type CompanionOverlaySnapshot = {
   animations: boolean
   scale: number
   leadState: CompanionState
+  labels: {
+    idle: string
+    dismiss: string
+    move: string
+    settings: string
+  }
   sessions: {
     id: string
     title: string
@@ -80,6 +86,13 @@ export function companionState(input: {
 
 export function sortCompanionSessions(sessions: CompanionSession[]) {
   return sessions.toSorted((a, b) => priority[a.state] - priority[b.state] || b.updatedAt - a.updatedAt)
+}
+
+export function companionCards(active: CompanionSession[], all: CompanionSession[]) {
+  if (!active.length) return all.slice(0, 12)
+  if (active.length >= 3) return active.slice(0, 12)
+  const activeIDs = new Set(active.map((session) => session.id))
+  return active.concat(all.filter((session) => !activeIDs.has(session.id)).slice(0, 3 - active.length))
 }
 
 export function companionProgress(todos: { content: string; status: string }[]) {

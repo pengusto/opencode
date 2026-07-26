@@ -194,7 +194,7 @@ function Companion() {
           }
           data-companion-interactive
         >
-          <For each={sessions()} fallback={<div class="companion-empty">Keine aktiven Tasks</div>}>
+          <For each={sessions()} fallback={<div class="companion-empty">{state.snapshot?.labels.idle}</div>}>
             {(session) => (
               <div class="companion-card">
                 <button
@@ -227,7 +227,7 @@ function Companion() {
                   <button
                     type="button"
                     class="companion-dismiss"
-                    aria-label="Chat ausblenden"
+                    aria-label={state.snapshot?.labels.dismiss}
                     onClick={() => setState("dismissed", session.id, true)}
                   >
                     <span class="companion-dismiss-idle" aria-hidden="true">○</span>
@@ -244,7 +244,7 @@ function Companion() {
           class="companion-pet"
           classList={{ "cursor-grabbing": state.dragging }}
           data-companion-interactive
-          aria-label="Molebyte verschieben"
+          aria-label={state.snapshot?.labels.move}
           style={{ top: `${state.petY}px`, transform: `scale(${state.snapshot?.scale ?? 1})` }}
           onPointerDown={startDrag}
           onPointerMove={move}
@@ -298,7 +298,7 @@ function Companion() {
                 window.companion.openSettings()
               }}
             >
-              Companion-Einstellungen…
+              {state.snapshot?.labels.settings}…
             </button>
           </div>
         </Show>

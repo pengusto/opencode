@@ -13,6 +13,12 @@ const snapshot = {
   animations: true,
   scale: 1,
   leadState: "working",
+  labels: {
+    idle: "No active tasks",
+    dismiss: "Dismiss chat",
+    move: "Move Molebyte",
+    settings: "Companion settings",
+  },
   sessions: [
     {
       id: "ses_123",
@@ -70,6 +76,17 @@ describe("companion window", () => {
       x: 360,
       y: 230,
     })
+  })
+
+  test("moves away from a clamped edge without cursor overshoot", () => {
+    const display = { x: 0, y: 0, width: 1_920, height: 1_080 }
+    const edge = clampCompanionBounds(
+      companionDragBounds({ x: 300, y: 0, width: 350, height: 500 }, { x: 350, y: 20 }, { x: 350, y: -80 }),
+      display,
+    )
+    expect(
+      clampCompanionBounds(companionDragBounds(edge, { x: 350, y: -80 }, { x: 350, y: -70 }), display).y,
+    ).toBe(10)
   })
 
   test("validates persisted display positions", () => {

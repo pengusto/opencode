@@ -37,6 +37,10 @@ export function parseCompanionSnapshot(value: unknown): CompanionOverlaySnapshot
   if (typeof input.animations !== "boolean") return
   if (typeof input.scale !== "number" || input.scale < 0.6 || input.scale > 1.6) return
   if (typeof input.leadState !== "string" || !states.has(input.leadState as CompanionState)) return
+  if (!input.labels || typeof input.labels !== "object" || Array.isArray(input.labels)) return
+  const labels = input.labels as Record<string, unknown>
+  if (![labels.idle, labels.dismiss, labels.move, labels.settings].every((label) => typeof label === "string" && label.length <= 200))
+    return
   if (!Array.isArray(input.sessions) || input.sessions.length > 12) return
 
   const sessions = input.sessions.flatMap((value) => {
@@ -71,6 +75,12 @@ export function parseCompanionSnapshot(value: unknown): CompanionOverlaySnapshot
     animations: input.animations,
     scale: input.scale,
     leadState: input.leadState as CompanionState,
+    labels: {
+      idle: labels.idle as string,
+      dismiss: labels.dismiss as string,
+      move: labels.move as string,
+      settings: labels.settings as string,
+    },
     sessions,
   }
 }

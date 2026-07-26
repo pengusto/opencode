@@ -300,6 +300,7 @@ export function moveCompanionWindow(win: BrowserWindow | null) {
     screen.getDisplayNearestPoint(cursor).bounds,
   )
   win.setPosition(next.x, next.y)
+  companionDrag = { cursor, bounds: next }
 }
 
 export function reanchorCompanionWindow(win: BrowserWindow | null, deltaY: unknown) {
@@ -428,7 +429,14 @@ function wireCompanionDisplays() {
   if (companionDisplaysWired) return
   companionDisplaysWired = true
   screen.on("display-removed", restoreCompanionBounds)
-  screen.on("display-metrics-changed", restoreCompanionBounds)
+  screen.on("display-metrics-changed", recreateCompanionWindow)
+}
+
+function recreateCompanionWindow() {
+  const win = companionWindow
+  if (!win || win.isDestroyed()) return
+  win.destroy()
+  updateCompanionWindow()
 }
 
 function restoreCompanionBounds() {

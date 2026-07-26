@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import {
+  companionCards,
   companionCardsBelow,
   companionPetY,
   clampCompanionPosition,
@@ -47,6 +48,12 @@ describe("task companion", () => {
       runningTools: 0,
     })
     expect(sortCompanionSessions([session("busy", "working"), session("ask", "waiting_for_user")])[0]?.id).toBe("ask")
+    expect(
+      companionCards(
+        [session("busy", "working"), session("ask", "waiting_for_user")],
+        [session("recent", "idle"), session("busy", "working"), session("ask", "waiting_for_user")],
+      ).map((item) => item.id),
+    ).toEqual(["busy", "ask", "recent"])
   })
 
   test("reports the current real todo and clamps dragging to the viewport", () => {
