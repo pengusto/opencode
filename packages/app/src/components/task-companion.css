@@ -1,0 +1,85 @@
+@keyframes task-companion-blink {
+  0%,
+  46%,
+  50%,
+  100% {
+    transform: scaleY(1);
+  }
+  48% {
+    transform: scaleY(0.9);
+  }
+}
+
+.task-companion-active {
+  animation: task-companion-blink 4.8s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+.task-companion-signal {
+  transform-origin: bottom right;
+}
+
+.task-companion-scroll {
+  scrollbar-color: color-mix(in srgb, var(--text-weak) 35%, transparent) transparent;
+}
+
+.task-companion-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.task-companion-card {
+  background: var(--background-base);
+}
+
+.task-companion-card:hover {
+  background: color-mix(in srgb, var(--background-base) 94%, var(--text-strong));
+}
+
+.task-companion-dismiss {
+  color: var(--icon-success-base);
+  background: color-mix(in srgb, var(--icon-success-base) 15%, transparent);
+}
+
+.task-companion-dismiss-hover {
+  display: none;
+}
+
+.task-companion-card:hover .task-companion-dismiss-idle {
+  display: none;
+}
+
+.task-companion-card:hover .task-companion-dismiss-hover {
+  display: inline;
+  color: var(--icon-success-base);
+}
+
+.task-companion-dismiss:hover {
+  color: var(--icon-critical-base);
+  background: color-mix(in srgb, var(--icon-critical-base) 15%, transparent);
+}
+
+.task-companion-card:hover .task-companion-dismiss:hover .task-companion-dismiss-hover {
+  color: var(--icon-critical-base);
+}
+
+@keyframes task-companion-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.task-companion-status-running {
+  border: 4px solid color-mix(in srgb, currentColor 25%, transparent);
+  border-top-color: currentColor;
+  animation: task-companion-spin 0.9s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .task-companion-active {
+    animation: none;
+  }
+
+  .task-companion-status-running {
+    animation: none;
+  }
+}

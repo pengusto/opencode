@@ -3,6 +3,7 @@ import { createStore } from "solid-js/store"
 import { useNavigate } from "@solidjs/router"
 import { DebugBar } from "@/components/debug-bar"
 import { TabsInfoPopup } from "@/components/help-button"
+import { TaskCompanion } from "@/components/task-companion"
 import { Titlebar, type TitlebarUpdate } from "@/components/titlebar"
 import { usePlatform } from "@/context/platform"
 import { setNavigate } from "@/utils/notification-click"
@@ -47,6 +48,7 @@ export default function NewLayout(props: ParentProps) {
       </main>
       {import.meta.env.DEV && state.debugTools && <DebugBar inline />}
       <TabsInfoPopup />
+      <TaskCompanion />
       <ToastRegion v2 />
     </div>
   )

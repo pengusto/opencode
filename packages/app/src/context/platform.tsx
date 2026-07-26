@@ -5,6 +5,7 @@ import type { DesktopMenuAction } from "../desktop-menu"
 import { ServerConnection } from "./server"
 import type { WslServersPlatform } from "../wsl/types"
 import type { UpdaterPlatform } from "../updater"
+import type { CompanionOverlaySnapshot } from "../components/task-companion-model"
 
 type PickerPaths = string | string[] | null
 type OpenDirectoryPickerOptions = { title?: string; multiple?: boolean }
@@ -120,6 +121,11 @@ type PlatformBase = {
 
   /** Record a fatal renderer error in platform logs (desktop only) */
   recordFatalRendererError?(error: FatalRendererErrorLog): Promise<void>
+
+  /** Publish the desktop companion view model to its native overlay window. */
+  companionOverlay?: {
+    publish(snapshot: CompanionOverlaySnapshot): void
+  }
 }
 
 export type Platform = PlatformBase &

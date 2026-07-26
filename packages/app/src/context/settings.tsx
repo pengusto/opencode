@@ -20,6 +20,14 @@ export interface SoundSettings {
 }
 
 export interface Settings {
+  companion: {
+    enabled: boolean
+    animations: boolean
+    mode?: "disabled" | "orbit" | "animated"
+    scale?: number
+    showCompletedForSeconds?: number
+    position?: { x: number; y: number }
+  }
   general: {
     autoSave: boolean
     releaseNotes: boolean
@@ -175,6 +183,13 @@ export function terminalFontFamily(font: string | undefined) {
 }
 
 const defaultSettings: Settings = {
+  companion: {
+    enabled: true,
+    animations: true,
+    mode: "animated",
+    scale: 1,
+    showCompletedForSeconds: 8,
+  },
   general: {
     autoSave: true,
     releaseNotes: true,
@@ -344,6 +359,37 @@ export const { use: useSettings, provider: SettingsProvider } = createSimpleCont
       ready,
       get current() {
         return store
+      },
+      companion: {
+        enabled: withFallback(() => store.companion?.enabled, defaultSettings.companion.enabled),
+        setEnabled(value: boolean) {
+          setStore("companion", "enabled", value)
+          setStore("companion", "mode", value ? defaultSettings.companion.mode : "disabled")
+        },
+        mode: withFallback(
+          () => store.companion?.mode,
+          !store.companion?.enabled ? "disabled" : defaultSettings.companion.mode!,
+        ),
+        setMode(value: "disabled" | "orbit" | "animated") {
+          setStore("companion", "mode", value)
+          setStore("companion", "enabled", value !== "disabled")
+        },
+        animations: withFallback(() => store.companion?.animations, defaultSettings.companion.animations),
+        setAnimations(value: boolean) {
+          setStore("companion", "animations", value)
+        },
+        scale: withFallback(() => store.companion?.scale, defaultSettings.companion.scale!),
+        setScale(value: number) {
+          setStore("companion", "scale", Math.min(1.6, Math.max(0.6, value)))
+        },
+        showCompletedForSeconds: withFallback(
+          () => store.companion?.showCompletedForSeconds,
+          defaultSettings.companion.showCompletedForSeconds!,
+        ),
+        position: () => store.companion?.position,
+        setPosition(value: { x: number; y: number }) {
+          setStore("companion", "position", value)
+        },
       },
       general: {
         autoSave: withFallback(() => store.general?.autoSave, defaultSettings.general.autoSave),

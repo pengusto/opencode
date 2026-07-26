@@ -28,6 +28,7 @@ export function useSettingsCommand() {
   const command = useCommand()
   const language = useLanguage()
   const show = useSettingsDialog()
+  const showCompanion = useSettingsDialog("companion")
 
   command.register("settings", () => [
     {
@@ -36,6 +37,12 @@ export function useSettingsCommand() {
       category: language.t("command.category.settings"),
       keybind: "mod+comma",
       onSelect: show,
+    },
+    {
+      id: "settings.companion",
+      title: "Companion settings",
+      category: language.t("command.category.settings"),
+      onSelect: showCompanion,
     },
   ])
 

@@ -3,6 +3,21 @@ import { dict as en } from "./en"
 type Keys = keyof typeof en
 
 export const dict = {
+  "companion.title": "Task Orbit",
+  "companion.open": "Task Orbit öffnen",
+  "companion.idle": "Keine aktiven Aufgaben",
+  "companion.state.idle": "Inaktiv",
+  "companion.state.thinking": "Denkt nach",
+  "companion.state.working": "Arbeitet",
+  "companion.state.waiting_for_permission": "Berechtigung erforderlich",
+  "companion.state.waiting_for_user": "Antwort erforderlich",
+  "companion.state.completed": "Abgeschlossen",
+  "companion.state.failed": "Fehlgeschlagen",
+  "companion.state.cancelled": "Abgebrochen",
+  "settings.general.companion.enabled.title": "Task Orbit",
+  "settings.general.companion.enabled.description": "Aktive Sessions in einem kompakten Companion anzeigen.",
+  "settings.general.companion.animations.title": "Task-Orbit-Animationen",
+  "settings.general.companion.animations.description": "Companion während aktiver Aufgaben animieren.",
   "command.category.suggested": "Vorgeschlagen",
   "command.category.view": "Ansicht",
   "command.category.project": "Projekt",
