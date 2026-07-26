@@ -27,6 +27,7 @@ target
 .direnv/
 
 # Local dev files
+.scratch/
 opencode-dev
 UPCOMING_CHANGELOG.md
 logs/
