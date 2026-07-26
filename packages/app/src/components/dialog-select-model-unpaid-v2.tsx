@@ -82,7 +82,21 @@ export const DialogSelectModelUnpaidV2: Component<{ model?: ModelState }> = (pro
                 {language.t("dialog.model.unpaid.freeModels.title")}
               </div>
             </div>
-            <For each={freeModels()}>
+            <For
+              each={freeModels()}
+              fallback={
+                <div class="flex w-full flex-col items-start gap-2 px-3 py-2 text-[13px] text-v2-text-text-muted">
+                  <span>{language.t("dialog.model.empty")}</span>
+                  <button
+                    type="button"
+                    class="rounded-md bg-v2-background-bg-layer-02 px-3 py-2 font-[530] text-v2-text-text-base hover:bg-v2-overlay-simple-overlay-hover focus:outline-none"
+                    onClick={() => openProviders()}
+                  >
+                    {language.t("dialog.model.unpaid.addMore.title")}
+                  </button>
+                </div>
+              }
+            >
               {(item) => (
                 <TooltipV2
                   class="w-full"
