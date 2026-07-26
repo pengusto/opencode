@@ -1,0 +1,263 @@
+:root,
+html,
+body,
+#root {
+  width: 350px;
+  height: 500px;
+  margin: 0;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+body {
+  user-select: none;
+}
+
+.companion-overlay {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.companion-cards {
+  position: absolute;
+  bottom: 326px;
+  left: 8px;
+  width: 334px;
+  max-height: 181px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  pointer-events: auto;
+  scrollbar-color: color-mix(in srgb, var(--text-weak) 35%, transparent) transparent;
+}
+
+.companion-cards::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.companion-cards-below {
+  top: 326px;
+  bottom: auto;
+}
+
+.companion-card,
+.companion-empty {
+  min-height: 54px;
+  border: 1px solid var(--border-base);
+  border-radius: 18px;
+  background: var(--background-base);
+  box-shadow: 0 12px 28px rgb(0 0 0 / 24%);
+  color: var(--text-strong);
+  backdrop-filter: blur(12px);
+}
+
+.companion-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-right: 10px;
+}
+
+.companion-card:hover {
+  background: color-mix(in srgb, var(--background-base) 94%, var(--text-strong));
+}
+
+.companion-card-open:focus-visible,
+.companion-dismiss:focus-visible,
+.companion-pet:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+.companion-card-open {
+  min-width: 0;
+  min-height: 52px;
+  flex: 1;
+  padding: 8px 4px 8px 14px;
+  border: 0;
+  border-radius: 18px 0 0 18px;
+  color: inherit;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.companion-card-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.companion-card-copy strong,
+.companion-card-copy span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.companion-card-copy strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.companion-card-copy span {
+  color: var(--text-weak);
+  font-size: 12px;
+}
+
+.companion-empty {
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  color: var(--text-weak);
+  font-size: 12px;
+}
+
+.companion-status {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+}
+
+.companion-dismiss {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  color: var(--icon-success-base);
+  background: color-mix(in srgb, var(--icon-success-base) 15%, transparent);
+  cursor: pointer;
+}
+
+.companion-dismiss-hover {
+  display: none;
+}
+
+.companion-card:hover .companion-dismiss-idle {
+  display: none;
+}
+
+.companion-card:hover .companion-dismiss-hover {
+  display: inline;
+  color: var(--icon-success-base);
+}
+
+.companion-dismiss:hover {
+  color: var(--icon-critical-base);
+  background: color-mix(in srgb, var(--icon-critical-base) 15%, transparent);
+}
+
+.companion-card:hover .companion-dismiss:hover .companion-dismiss-hover {
+  color: var(--icon-critical-base);
+}
+
+.companion-status-success {
+  color: var(--icon-success-base);
+  background: color-mix(in srgb, var(--icon-success-base) 15%, transparent);
+}
+
+.companion-status-error {
+  color: var(--icon-critical-base);
+  background: color-mix(in srgb, var(--icon-critical-base) 15%, transparent);
+}
+
+.companion-status-running {
+  border: 4px solid color-mix(in srgb, var(--text-weak) 25%, transparent);
+  border-top-color: var(--text-weak);
+  animation: task-companion-spin 0.9s linear infinite;
+}
+
+.companion-pet {
+  position: absolute;
+  left: 127px;
+  width: 96px;
+  height: 104px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: grab;
+  pointer-events: auto;
+  transform-origin: center bottom;
+}
+
+.companion-face {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+
+.companion-face i {
+  position: absolute;
+  top: 9px;
+  width: 3px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.companion-face i:first-child { left: 8px; }
+.companion-face i:nth-child(2) { right: 8px; }
+.companion-face b {
+  position: absolute;
+  left: 8px;
+  bottom: 7px;
+  width: 14px;
+  height: 7px;
+  border-bottom: 2px solid currentColor;
+  border-radius: 50%;
+}
+
+.companion-menu {
+  position: absolute;
+  left: 92px;
+  top: 128px;
+  width: 166px;
+  padding: 5px;
+  border: 1px solid var(--border-base);
+  border-radius: 10px;
+  background: var(--background-base);
+  box-shadow: 0 12px 28px rgb(0 0 0 / 24%);
+  pointer-events: auto;
+}
+
+.companion-menu button {
+  width: 100%;
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--text-strong);
+  background: transparent;
+  text-align: left;
+}
+
+.companion-menu button:hover { background: var(--surface-raised-base-hover); }
+
+.companion-orbit {
+  display: grid;
+  width: 96px;
+  height: 104px;
+  place-items: center;
+  border-radius: 999px;
+  color: var(--text-strong);
+  font-size: 28px;
+  background: color-mix(in srgb, var(--background-base) 90%, transparent);
+  box-shadow: 0 12px 28px rgb(0 0 0 / 24%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .companion-status-running {
+    animation: none;
+  }
+}

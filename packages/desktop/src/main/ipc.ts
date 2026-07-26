@@ -10,9 +10,25 @@ import { runDesktopMenuAction } from "./desktop-menu-actions"
 import { setForceFocus } from "./debug"
 import { assertAttachmentBudget, createPickedFileAuthorizations } from "./attachment-picker"
 import { getStore, removeStoreFileIfEmpty } from "./store"
-import { getPinchZoomEnabled, getWindowID, setPinchZoomEnabled, setTitlebar, updateTitlebar } from "./windows"
+import {
+  companionRendererReady,
+  finishCompanionDrag,
+  getPinchZoomEnabled,
+  getWindowID,
+  moveCompanionWindow,
+  openCompanionSession,
+  openCompanionSettings,
+  publishCompanionSnapshot,
+  reanchorCompanionWindow,
+  setCompanionInteractive,
+  startCompanionDrag,
+  setPinchZoomEnabled,
+  setTitlebar,
+  updateTitlebar,
+} from "./windows"
 import type { UpdaterController } from "./updater-controller"
 import { createUpdaterSubscriptions } from "./updater-subscriptions"
+import { parseCompanionSnapshot } from "./companion-window"
 
 const pickerFilters = (ext?: string[]) => {
   if (!ext || ext.length === 0) return undefined
@@ -220,6 +236,37 @@ export function registerIpcHandlers(deps: Deps) {
     const id = getWindowID(win)
     if (!id) throw new Error("Window ID not found")
     return id
+  })
+
+  ipcMain.on("companion-publish", (event: IpcMainEvent, value: unknown) => {
+    const win = BrowserWindow.fromWebContents(event.sender)
+    const snapshot = parseCompanionSnapshot(value)
+    if (!win || !getWindowID(win) || !snapshot) return
+    publishCompanionSnapshot(win, snapshot)
+  })
+  ipcMain.on("companion-ready", (event: IpcMainEvent) => {
+    companionRendererReady(BrowserWindow.fromWebContents(event.sender))
+  })
+  ipcMain.on("companion-start-drag", (event: IpcMainEvent) => {
+    startCompanionDrag(BrowserWindow.fromWebContents(event.sender))
+  })
+  ipcMain.on("companion-move", (event: IpcMainEvent) => {
+    moveCompanionWindow(BrowserWindow.fromWebContents(event.sender))
+  })
+  ipcMain.on("companion-reanchor", (event: IpcMainEvent, deltaY: unknown) => {
+    reanchorCompanionWindow(BrowserWindow.fromWebContents(event.sender), deltaY)
+  })
+  ipcMain.on("companion-end-drag", (event: IpcMainEvent) => {
+    finishCompanionDrag(BrowserWindow.fromWebContents(event.sender))
+  })
+  ipcMain.on("companion-interactive", (event: IpcMainEvent, interactive: unknown) => {
+    setCompanionInteractive(BrowserWindow.fromWebContents(event.sender), interactive)
+  })
+  ipcMain.on("companion-open-session", (event: IpcMainEvent, sessionID: unknown) => {
+    openCompanionSession(BrowserWindow.fromWebContents(event.sender), sessionID)
+  })
+  ipcMain.on("companion-open-settings", (event: IpcMainEvent) => {
+    openCompanionSettings(BrowserWindow.fromWebContents(event.sender))
   })
 
   ipcMain.handle("get-window-focused", (event: IpcMainInvokeEvent) => {

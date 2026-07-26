@@ -17,7 +17,7 @@ import {
 import type { UpdaterState } from "@opencode-ai/app/updater"
 import * as Sentry from "@sentry/solid"
 import type { AsyncStorage } from "@solid-primitives/storage"
-import { createMemoryHistory, MemoryRouter, type BaseRouterProps } from "@solidjs/router"
+import { createMemoryHistory, MemoryRouter, type BaseRouterProps, useNavigate } from "@solidjs/router"
 import { createEffect, createMemo, createResource, createSignal, onCleanup, onMount, Show } from "solid-js"
 import { render } from "solid-js/web"
 import pkg from "../../package.json"
@@ -244,6 +244,10 @@ const createPlatform = (windowState: DesktopWindowState): Platform => {
 
     recordFatalRendererError: (error) => window.api.recordFatalRendererError(error),
 
+    companionOverlay: {
+      publish: (snapshot) => window.api.companion.publish(snapshot),
+    },
+
     restart: async () => {
       await window.api.killSidecar().catch(() => undefined)
       window.api.relaunch()
@@ -365,7 +369,10 @@ function DesktopRoot(props: { windowState: DesktopWindowState }) {
 
   function Inner() {
     const cmd = useCommand()
+    const navigate = useNavigate()
     menuTrigger = (id) => cmd.trigger(id)
+    onCleanup(window.api.companion.onOpenSession((href) => navigate(href)))
+    onCleanup(window.api.companion.onOpenSettings(() => cmd.trigger("settings.companion")))
 
     const theme = useTheme()
 

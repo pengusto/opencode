@@ -1,6 +1,7 @@
 import type { DesktopMenuAction } from "@opencode-ai/app/desktop-menu"
 import type { WslServersPlatform } from "@opencode-ai/app/wsl/types"
 import type { UpdaterState } from "@opencode-ai/app/updater"
+import type { CompanionOverlaySnapshot } from "@opencode-ai/app/task-companion"
 export type {
   WslDistroProbe,
   WslInstalledDistro,
@@ -106,4 +107,21 @@ export type ElectronAPI = {
   exportDebugLogs: () => Promise<string>
   setForceFocus: (enabled: boolean) => Promise<void>
   recordFatalRendererError: (error: FatalRendererError) => Promise<void>
+  companion: {
+    publish: (snapshot: CompanionOverlaySnapshot) => void
+    onOpenSession: (cb: (href: string) => void) => () => void
+    onOpenSettings: (cb: () => void) => () => void
+  }
+}
+
+export type CompanionAPI = {
+  onSnapshot: (cb: (snapshot: CompanionOverlaySnapshot) => void) => () => void
+  onCursor: (cb: (point: { x: number; y: number }) => void) => () => void
+  startDrag: () => void
+  move: () => void
+  reanchor: (deltaY: number) => void
+  endDrag: () => void
+  setInteractive: (interactive: boolean) => void
+  openSession: (sessionID: string) => void
+  openSettings: () => void
 }

@@ -1,19 +1,21 @@
 import windowState from "electron-window-state"
 import { resolveThemeVariant } from "@opencode-ai/ui/theme/resolve"
 import type { DesktopTheme } from "@opencode-ai/ui/theme/types"
+import type { CompanionOverlaySnapshot } from "@opencode-ai/app/task-companion"
 import oc2ThemeJson from "../../../ui/src/theme/themes/oc-2.json"
 import { randomUUID } from "node:crypto"
 import { rmSync } from "node:fs"
-import { app, BrowserWindow, dialog, net, nativeImage, nativeTheme, protocol } from "electron"
+import { app, BrowserWindow, dialog, net, nativeImage, nativeTheme, protocol, screen } from "electron"
 import { dirname, isAbsolute, join, relative, resolve } from "node:path"
 import { fileURLToPath, pathToFileURL } from "node:url"
 import type { TitlebarTheme } from "../preload/types"
 import { exportDebugLogs, write as writeLog } from "./logging"
 import { getStore, removeStoreFile } from "./store"
-import { PINCH_ZOOM_ENABLED_KEY, WINDOW_IDS_KEY } from "./store-keys"
+import { COMPANION_POSITION_KEY, PINCH_ZOOM_ENABLED_KEY, WINDOW_IDS_KEY } from "./store-keys"
 import { createUnresponsiveSampler } from "./unresponsive"
 import { createWindowRegistry } from "./window-registry"
 import { safeWindowURL } from "./window-state"
+import { clampCompanionBounds, companionDragBounds, parseCompanionWindowPosition } from "./companion-window"
 
 const root = dirname(fileURLToPath(import.meta.url))
 const rendererRoot = join(root, "../renderer")
@@ -62,12 +64,23 @@ const registry = createWindowRegistry<BrowserWindow>({
 const titlebarHeight = 40
 const maxZoomLevel = 10
 const minZoomLevel = 0.2
+const companionSize = { width: 350, height: 500 }
+const companionSnapshots = new WeakMap<BrowserWindow, CompanionOverlaySnapshot>()
+let companionWindow: BrowserWindow | undefined
+let companionSource: BrowserWindow | undefined
+let companionReady = false
+let companionDrag:
+  | { cursor: { x: number; y: number }; bounds: { x: number; y: number; width: number; height: number } }
+  | undefined
+let companionDisplaysWired = false
+let appQuitting = false
 
 export function setRelaunchHandler(handler: () => void) {
   relaunchHandler = handler
 }
 
 export function setAppQuitting(quitting = true) {
+  appQuitting = quitting
   registry.setQuitting(quitting)
 }
 
@@ -146,7 +159,7 @@ export function getWindowID(win: BrowserWindow) {
 
 export function getLastFocusedWindow() {
   const focused = BrowserWindow.getFocusedWindow()
-  if (focused) return focused
+  if (focused && windowIDs.has(focused)) return focused
   const win = registry.lastFocused()
   if (!win || win.isDestroyed()) return null
   return win
@@ -233,11 +246,207 @@ function registerWindow(win: BrowserWindow, id: string) {
   windowIDs.set(win, id)
   registry.register(id, win)
 
-  win.on("focus", () => registry.focused(id))
+  win.on("focus", () => {
+    registry.focused(id)
+    companionSource = win
+    updateCompanionWindow()
+  })
   // Windows never emits before-quit on OS shutdown/logoff, but each window
   // gets session-end before it closes; flag the quit so ids stay persisted.
   win.on("session-end", () => registry.setQuitting())
-  win.on("closed", () => registry.closed(id))
+  win.webContents.on("render-process-gone", () => {
+    companionSnapshots.delete(win)
+    if (companionSource === win) updateCompanionWindow()
+  })
+  win.on("closed", () => {
+    companionSnapshots.delete(win)
+    registry.closed(id)
+    if (companionSource !== win) return
+    companionSource = registry.lastFocused()
+    updateCompanionWindow()
+  })
+}
+
+export function publishCompanionSnapshot(win: BrowserWindow, snapshot: CompanionOverlaySnapshot) {
+  if (!windowIDs.has(win)) return
+  companionSnapshots.set(win, snapshot)
+  const active = getLastFocusedWindow()
+  if (!companionSource || active === win) companionSource = win
+  if (companionSource !== win) return
+  updateCompanionWindow()
+}
+
+export function isCompanionWindow(win: BrowserWindow | null): win is BrowserWindow {
+  return !!win && win === companionWindow
+}
+
+export function companionRendererReady(win: BrowserWindow | null) {
+  if (!isCompanionWindow(win)) return
+  companionReady = true
+  updateCompanionWindow()
+}
+
+export function startCompanionDrag(win: BrowserWindow | null) {
+  if (!isCompanionWindow(win)) return
+  companionDrag = { cursor: screen.getCursorScreenPoint(), bounds: win.getBounds() }
+}
+
+export function moveCompanionWindow(win: BrowserWindow | null) {
+  if (!isCompanionWindow(win) || !companionDrag) return
+  const cursor = screen.getCursorScreenPoint()
+  if (cursor.x === companionDrag.cursor.x && cursor.y === companionDrag.cursor.y) return
+  const next = clampCompanionBounds(
+    companionDragBounds(companionDrag.bounds, companionDrag.cursor, cursor),
+    screen.getDisplayNearestPoint(cursor).bounds,
+  )
+  win.setPosition(next.x, next.y)
+}
+
+export function reanchorCompanionWindow(win: BrowserWindow | null, deltaY: unknown) {
+  if (!isCompanionWindow(win) || typeof deltaY !== "number" || !Number.isFinite(deltaY) || Math.abs(deltaY) > 500)
+    return
+  const bounds = win.getBounds()
+  const next = clampCompanionBounds(
+    { ...bounds, y: bounds.y + deltaY },
+    screen.getDisplayMatching(bounds).bounds,
+  )
+  const applied = next.y - bounds.y
+  win.setPosition(next.x, next.y)
+  if (companionDrag) companionDrag.bounds.y += applied
+}
+
+export function finishCompanionDrag(win: BrowserWindow | null) {
+  if (!isCompanionWindow(win)) return
+  companionDrag = undefined
+  restoreCompanionBounds()
+  persistCompanionPosition()
+}
+
+export function setCompanionInteractive(win: BrowserWindow | null, interactive: unknown) {
+  if (!isCompanionWindow(win) || typeof interactive !== "boolean") return
+  if (process.platform === "linux") return
+  win.setIgnoreMouseEvents(!interactive, { forward: !interactive })
+}
+
+export function openCompanionSession(win: BrowserWindow | null, sessionID: unknown) {
+  if (!isCompanionWindow(win) || typeof sessionID !== "string") return
+  const source = companionSource
+  if (!source || source.isDestroyed()) return
+  const session = companionSnapshots.get(source)?.sessions.find((item) => item.id === sessionID)
+  if (!session) return
+  source.show()
+  source.focus()
+  source.webContents.send("companion-open-session", session.href)
+}
+
+export function openCompanionSettings(win: BrowserWindow | null) {
+  if (!isCompanionWindow(win)) return
+  const source = companionSource
+  if (!source || source.isDestroyed()) return
+  source.show()
+  source.focus()
+  source.webContents.send("companion-open-settings")
+}
+
+function updateCompanionWindow() {
+  if (appQuitting) return
+  const source = companionSource
+  const snapshot = source && !source.isDestroyed() ? companionSnapshots.get(source) : undefined
+  if (!snapshot?.visible) {
+    companionWindow?.hide()
+    return
+  }
+
+  const win = companionWindow ?? createCompanionWindow()
+  if (companionReady) win.webContents.send("companion-snapshot", snapshot)
+  if (!win.isVisible()) win.showInactive()
+}
+
+function createCompanionWindow() {
+  wireCompanionDisplays()
+  const stored = parseCompanionWindowPosition(getStore().get(COMPANION_POSITION_KEY))
+  const display = screen.getAllDisplays().find((item) => item.id === stored?.displayId) ?? screen.getPrimaryDisplay()
+  const initial = clampCompanionBounds(
+    {
+      x: stored?.x ?? display.workArea.x + display.workArea.width - companionSize.width - 24,
+      y: stored?.y ?? display.workArea.y + display.workArea.height - companionSize.height - 24,
+      ...companionSize,
+    },
+    display.bounds,
+  )
+  const win = new BrowserWindow({
+    ...initial,
+    show: false,
+    transparent: true,
+    frame: false,
+    resizable: false,
+    hasShadow: false,
+    skipTaskbar: true,
+    alwaysOnTop: true,
+    backgroundColor: "#00000000",
+    webPreferences: {
+      preload: join(root, "../preload/companion.js"),
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
+    },
+  })
+  companionWindow = win
+  win.setBackgroundColor("#00000000")
+  companionReady = false
+  win.setAlwaysOnTop(true, "floating")
+  if (process.platform === "darwin") win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+  if (process.platform !== "linux") win.setIgnoreMouseEvents(true, { forward: true })
+  win.webContents.setWindowOpenHandler(() => ({ action: "deny" }))
+  win.webContents.on("will-navigate", (event, url) => {
+    if (isRendererUrl(url)) return
+    event.preventDefault()
+  })
+  win.webContents.once("render-process-gone", () => {
+    win.destroy()
+    setTimeout(updateCompanionWindow, 1_000)
+  })
+  loadWindow(win, "companion.html")
+  let cursor = screen.getCursorScreenPoint()
+  const cursorTimer = setInterval(() => {
+    if (!companionReady || !win.isVisible()) return
+    const next = screen.getCursorScreenPoint()
+    if (next.x === cursor.x && next.y === cursor.y) return
+    cursor = next
+    win.webContents.send("companion-cursor", next)
+  }, 33)
+  win.on("closed", () => {
+    clearInterval(cursorTimer)
+    if (companionWindow !== win) return
+    companionWindow = undefined
+    companionReady = false
+  })
+  return win
+}
+
+function wireCompanionDisplays() {
+  if (companionDisplaysWired) return
+  companionDisplaysWired = true
+  screen.on("display-removed", restoreCompanionBounds)
+  screen.on("display-metrics-changed", restoreCompanionBounds)
+}
+
+function restoreCompanionBounds() {
+  const win = companionWindow
+  if (!win || win.isDestroyed()) return
+  const bounds = win.getBounds()
+  win.setBounds(clampCompanionBounds(bounds, screen.getDisplayMatching(bounds).bounds))
+}
+
+function persistCompanionPosition() {
+  const win = companionWindow
+  if (!win || win.isDestroyed()) return
+  const bounds = win.getBounds()
+  getStore().set(COMPANION_POSITION_KEY, {
+    displayId: screen.getDisplayMatching(bounds).id,
+    x: bounds.x,
+    y: bounds.y,
+  })
 }
 
 function windowStateFile(id: string) {

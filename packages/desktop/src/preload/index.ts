@@ -123,6 +123,19 @@ const api: ElectronAPI = {
   exportDebugLogs: () => ipcRenderer.invoke("export-debug-logs"),
   setForceFocus: (enabled) => ipcRenderer.invoke("set-force-focus", enabled),
   recordFatalRendererError: (error) => ipcRenderer.invoke("record-fatal-renderer-error", error),
+  companion: {
+    publish: (snapshot) => ipcRenderer.send("companion-publish", snapshot),
+    onOpenSession: (cb) => {
+      const handler = (_: unknown, href: string) => cb(href)
+      ipcRenderer.on("companion-open-session", handler)
+      return () => ipcRenderer.removeListener("companion-open-session", handler)
+    },
+    onOpenSettings: (cb) => {
+      const handler = () => cb()
+      ipcRenderer.on("companion-open-settings", handler)
+      return () => ipcRenderer.removeListener("companion-open-settings", handler)
+    },
+  },
 }
 
 contextBridge.exposeInMainWorld("api", api)
