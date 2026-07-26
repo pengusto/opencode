@@ -40,7 +40,7 @@ export function useSettingsCommand() {
     },
     {
       id: "settings.companion",
-      title: "Companion settings",
+      title: language.t("companion.settings"),
       category: language.t("command.category.settings"),
       onSelect: showCompanion,
     },

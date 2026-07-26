@@ -48,7 +48,7 @@ export const DialogSettings: Component<{ defaultValue?: string }> = (props) => {
                     </Tabs.Trigger>
                     <Tabs.Trigger value="companion">
                       <Icon name="task" />
-                      Companion
+                      {language.t("settings.companion.title")}
                     </Tabs.Trigger>
                     <Tabs.Trigger value="servers">
                       <Icon name="server" />

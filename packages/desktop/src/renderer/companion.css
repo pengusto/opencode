@@ -52,7 +52,6 @@ body {
   background: var(--background-base);
   box-shadow: 0 12px 28px rgb(0 0 0 / 24%);
   color: var(--text-strong);
-  backdrop-filter: blur(12px);
 }
 
 .companion-card {
@@ -221,8 +220,6 @@ body {
 
 .companion-menu {
   position: absolute;
-  left: 92px;
-  top: 128px;
   width: 166px;
   padding: 5px;
   border: 1px solid var(--border-base);

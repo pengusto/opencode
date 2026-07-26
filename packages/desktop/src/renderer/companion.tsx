@@ -41,6 +41,8 @@ function Companion() {
     hovering: false,
     interactive: false,
     menu: false,
+    menuX: 0,
+    menuY: 0,
     cardsBelow: false,
     petY: 198,
     dismissed: {} as Record<string, boolean | undefined>,
@@ -254,7 +256,11 @@ function Companion() {
           onPointerLeave={() => setState("hovering", false)}
           onContextMenu={(event) => {
             event.preventDefault()
-            setState("menu", true)
+            setState({
+              menu: true,
+              menuX: Math.min(event.clientX, 174),
+              menuY: Math.min(event.clientY, 448),
+            })
           }}
           onClick={(event) => {
             if (!state.moved) return
@@ -284,6 +290,7 @@ function Companion() {
         <Show when={state.menu}>
           <div
             class="companion-menu"
+            style={{ left: `${state.menuX}px`, top: `${state.menuY}px` }}
             data-companion-interactive
             onMouseLeave={() => {
               setState("menu", false)

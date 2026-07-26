@@ -7,9 +7,23 @@ import {
   newLayoutDesignsDefault,
   nextSunsetCheckDelay,
   resolveNewLayoutDesigns,
+  resolveCompanionMode,
   shouldDisplayTabsToast,
   shouldEnableNewLayout,
 } from "./settings"
+
+describe("companion settings", () => {
+  test("hides without forgetting the selected mode", () => {
+    expect(resolveCompanionMode(false, "orbit")).toBe("disabled")
+    expect(resolveCompanionMode(true, "orbit")).toBe("orbit")
+    expect(resolveCompanionMode(false, "animated")).toBe("disabled")
+    expect(resolveCompanionMode(true, "animated")).toBe("animated")
+  })
+
+  test("recovers legacy disabled settings with the default mode", () => {
+    expect(resolveCompanionMode(true, "disabled")).toBe("animated")
+  })
+})
 
 describe("layout transition", () => {
   test("blank profiles default to the new layout", () => {

@@ -230,6 +230,12 @@ const defaultSettings: Settings = {
   },
 }
 
+export function resolveCompanionMode(enabled: boolean, mode: Settings["companion"]["mode"]) {
+  if (!enabled) return "disabled" as const
+  if (!mode || mode === "disabled") return defaultSettings.companion.mode!
+  return mode
+}
+
 function withFallback<T>(read: () => T | undefined, fallback: T) {
   return createMemo(() => read() ?? fallback)
 }
@@ -364,11 +370,14 @@ export const { use: useSettings, provider: SettingsProvider } = createSimpleCont
         enabled: withFallback(() => store.companion?.enabled, defaultSettings.companion.enabled),
         setEnabled(value: boolean) {
           setStore("companion", "enabled", value)
-          setStore("companion", "mode", value ? defaultSettings.companion.mode : "disabled")
+          if (value && store.companion?.mode === "disabled")
+            setStore("companion", "mode", defaultSettings.companion.mode)
         },
-        mode: withFallback(
-          () => store.companion?.mode,
-          !store.companion?.enabled ? "disabled" : defaultSettings.companion.mode!,
+        mode: createMemo(() =>
+          resolveCompanionMode(
+            store.companion?.enabled ?? defaultSettings.companion.enabled,
+            store.companion?.mode,
+          ),
         ),
         setMode(value: "disabled" | "orbit" | "animated") {
           setStore("companion", "mode", value)
