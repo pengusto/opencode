@@ -21,11 +21,11 @@ import {
 import {
   companionAnimation,
   companionInput,
-  LegacyAtlasCompanionAdapter,
+  loadLegacyAtlas,
   type CompanionAnimationName,
   type LoadedCompanion,
 } from "./task-companion-package"
-import { loadBundledMolebyte, TaskCompanionSprite } from "./task-companion-renderer"
+import { loadBundledByte, TaskCompanionSprite } from "./task-companion-renderer"
 import "./task-companion.css"
 
 const symbol = {
@@ -68,7 +68,7 @@ export function TaskCompanion() {
     const timeout = setTimeout(() => {
       setOutcomes(sessionID, undefined)
       timeouts.delete(timeout)
-    }, settings.companion.showCompletedForSeconds() * 1_000)
+    }, 8_000)
     timeouts.add(timeout)
   }
   onCleanup(() => timeouts.forEach(clearTimeout))
@@ -104,9 +104,9 @@ export function TaskCompanion() {
       document.documentElement.removeEventListener("mouseleave", clearLook)
       clearTimeout(greeting)
     })
-    void loadBundledMolebyte()
+    void loadBundledByte()
       .then(setCompanion)
-      .catch((error) => setImportError(error instanceof Error ? error.message : "Molebyte could not be loaded"))
+      .catch((error) => setImportError(error instanceof Error ? error.message : "Byte could not be loaded"))
   })
 
   onCleanup(
@@ -145,9 +145,7 @@ export function TaskCompanion() {
             title: session.title,
             directory: session.directory,
             state,
-            startedAt: session.time.created,
             updatedAt: session.time.updated,
-            runningTools,
           },
         ]
       })
@@ -191,7 +189,7 @@ export function TaskCompanion() {
     if (!platform.companionOverlay) return
     const active = lead()
     platform.companionOverlay.publish({
-      visible: settings.companion.enabled(),
+      visible: settings.companion.mode() !== "disabled",
       mode: settings.companion.mode() === "animated" ? "animated" : "orbit",
       animations: settings.companion.animations(),
       scale: settings.companion.scale(),
@@ -268,9 +266,7 @@ export function TaskCompanion() {
     setImportError(undefined)
     try {
       const input = await companionInput([...files])
-      const adapter = new LegacyAtlasCompanionAdapter()
-      if (!adapter.detect(input)) throw new Error("No supported Companion Pack found")
-      setCompanion(adapter.load(input))
+      setCompanion(loadLegacyAtlas(input))
       settings.companion.setMode("animated")
     } catch (error) {
       setImportError(error instanceof Error ? error.message : "Companion Pack could not be imported")
@@ -280,7 +276,7 @@ export function TaskCompanion() {
   }
 
   return (
-    <Show when={settings.companion.enabled() && !platform.companionOverlay}>
+    <Show when={settings.companion.mode() !== "disabled" && !platform.companionOverlay}>
       <div
         ref={root}
         class="fixed z-[9999] touch-none"

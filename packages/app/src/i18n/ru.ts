@@ -9,8 +9,6 @@ export const dict = {
   "settings.companion.mode.disabled": "Отключено",
   "settings.companion.mode.orbit": "Значок компаньона",
   "settings.companion.mode.animated": "Анимированный компаньон",
-  "settings.companion.show.title": "Показывать компаньона",
-  "settings.companion.show.description": "Показывать активные сессии рядом с компаньоном.",
   "settings.companion.animations.title": "Анимации компаньона",
   "settings.companion.animations.description": "Анимировать компаньона во время активных задач.",
   "settings.companion.size.title": "Размер компаньона",

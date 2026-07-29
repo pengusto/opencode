@@ -9,8 +9,6 @@ export const dict = {
   "settings.companion.mode.disabled": "ปิดใช้งาน",
   "settings.companion.mode.orbit": "ไอคอนคู่หู",
   "settings.companion.mode.animated": "คู่หูแบบเคลื่อนไหว",
-  "settings.companion.show.title": "แสดงคู่หู",
-  "settings.companion.show.description": "แสดงเซสชันที่ใช้งานอยู่ข้างคู่หู",
   "settings.companion.animations.title": "ภาพเคลื่อนไหวของคู่หู",
   "settings.companion.animations.description": "แสดงภาพเคลื่อนไหวของคู่หูขณะมีงานทำงานอยู่",
   "settings.companion.size.title": "ขนาดคู่หู",

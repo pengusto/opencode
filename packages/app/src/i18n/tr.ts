@@ -13,8 +13,6 @@ export const dict = {
   "settings.companion.mode.disabled": "Devre dışı",
   "settings.companion.mode.orbit": "Yoldaş simgesi",
   "settings.companion.mode.animated": "Animasyonlu yoldaş",
-  "settings.companion.show.title": "Yoldaşı göster",
-  "settings.companion.show.description": "Etkin oturumları yoldaşın yanında gösterir.",
   "settings.companion.animations.title": "Yoldaş animasyonları",
   "settings.companion.animations.description": "Görevler etkinken yoldaşı hareketlendirir.",
   "settings.companion.size.title": "Yoldaş boyutu",

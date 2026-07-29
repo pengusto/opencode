@@ -13,8 +13,6 @@ export const dict = {
   "settings.companion.mode.disabled": "已停用",
   "settings.companion.mode.orbit": "夥伴圖示",
   "settings.companion.mode.animated": "動畫夥伴",
-  "settings.companion.show.title": "顯示夥伴",
-  "settings.companion.show.description": "在夥伴旁顯示進行中的工作階段。",
   "settings.companion.animations.title": "夥伴動畫",
   "settings.companion.animations.description": "工作進行時播放夥伴動畫。",
   "settings.companion.size.title": "夥伴大小",

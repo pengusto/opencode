@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { companionAnimation, LegacyAtlasCompanionAdapter, type CompanionFile } from "./task-companion-package"
+import { companionAnimation, loadLegacyAtlas, type CompanionFile } from "./task-companion-package"
 
 const manifest = (value = '{"id":"demo","name":"Demo","unknown":true}') => ({
   name: "pack/pet.json",
@@ -18,17 +18,14 @@ const atlas = (input: Partial<CompanionFile> = {}): CompanionFile => ({
 })
 
 describe("legacy companion pack", () => {
-  const adapter = new LegacyAtlasCompanionAdapter()
   test("detects and loads an 8 by 9 atlas while ignoring unknown fields", () => {
-    const input = { files: [manifest(), atlas()] }
-    expect(adapter.detect(input)).toBe(true)
-    expect(adapter.load(input).name).toBe("Demo")
+    expect(loadLegacyAtlas({ files: [manifest(), atlas()] }).name).toBe("Demo")
   })
-  test("loads Molebyte-style 8 by 11 v2 packs", () => {
-    const value = JSON.stringify({ id: "molebyte", displayName: "Molebyte", spriteVersionNumber: 2 })
-    const loaded = adapter.load({ files: [manifest(value), atlas({ height: 2288 })] })
+  test("loads Byte-style 8 by 11 v2 packs", () => {
+    const value = JSON.stringify({ id: "byte", displayName: "Byte", spriteVersionNumber: 2 })
+    const loaded = loadLegacyAtlas({ files: [manifest(value), atlas({ height: 2288 })] })
     expect(loaded.format).toBe("legacy-8x11-atlas")
-    expect(loaded.name).toBe("Molebyte")
+    expect(loaded.name).toBe("Byte")
     expect(
       ["idle", "running-right", "running-left", "waving", "jumping", "failed", "waiting", "running", "review"].map(
         (name) => loaded.animations[name as keyof typeof loaded.animations]?.row,
@@ -40,11 +37,11 @@ describe("legacy companion pack", () => {
     expect(loaded.animations["look-15"]).toMatchObject({ row: 10, startFrame: 7, frames: 1 })
   })
   test("rejects missing, damaged, oversized, traversing, and incorrectly sized input", () => {
-    expect(() => adapter.load({ files: [atlas()] })).toThrow("Missing pet.json")
-    expect(() => adapter.load({ files: [manifest("{"), atlas()] })).toThrow("Invalid JSON")
-    expect(() => adapter.load({ files: [manifest(), atlas({ size: 17 * 1024 * 1024 })] })).toThrow("16 MiB")
-    expect(() => adapter.load({ files: [{ ...manifest(), name: "../pet.json" }, atlas()] })).toThrow("unsafe path")
-    expect(() => adapter.load({ files: [manifest(), atlas({ width: 1 })] })).toThrow("1536 × 1872")
+    expect(() => loadLegacyAtlas({ files: [atlas()] })).toThrow("Missing pet.json")
+    expect(() => loadLegacyAtlas({ files: [manifest("{"), atlas()] })).toThrow("Invalid JSON")
+    expect(() => loadLegacyAtlas({ files: [manifest(), atlas({ size: 17 * 1024 * 1024 })] })).toThrow("16 MiB")
+    expect(() => loadLegacyAtlas({ files: [{ ...manifest(), name: "../pet.json" }, atlas()] })).toThrow("unsafe path")
+    expect(() => loadLegacyAtlas({ files: [manifest(), atlas({ width: 1 })] })).toThrow("1536 × 1872")
   })
   test("falls back when an animation is missing", () => {
     expect(companionAnimation("thinking", { idle: { row: 0, frames: 1, fps: 1, loop: true } })).toBe("idle")

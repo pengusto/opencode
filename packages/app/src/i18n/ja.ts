@@ -9,8 +9,6 @@ export const dict = {
   "settings.companion.mode.disabled": "無効",
   "settings.companion.mode.orbit": "コンパニオンアイコン",
   "settings.companion.mode.animated": "アニメーション付きコンパニオン",
-  "settings.companion.show.title": "コンパニオンを表示",
-  "settings.companion.show.description": "コンパニオンの横にアクティブなセッションを表示します。",
   "settings.companion.animations.title": "コンパニオンのアニメーション",
   "settings.companion.animations.description": "タスクの実行中にコンパニオンをアニメーション表示します。",
   "settings.companion.size.title": "コンパニオンのサイズ",

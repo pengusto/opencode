@@ -30,7 +30,7 @@ my-companion/
 
 The compatibility adapter accepts an 8-column by 9-row WebP atlas: 1536 × 1872 pixels, with 192 × 208 pixel cells. `pet.json` may provide `id`, `name`, `author`, `license`, and an HTTPS `source`. Unknown fields are ignored. Missing optional metadata gets safe display defaults.
 
-It also accepts custom v2 packs such as the bundled user-created **Molebyte** example: an 8-column by 11-row atlas at 1536 × 2288 pixels with `spriteVersionNumber: 2`, `displayName`, and 16 look directions. Task Companion supports all v2 rows: idle, directional dragging, waving, jumping, failed, waiting, running, review, and the 16 clockwise cursor-look poses. Per-frame v2 durations are preserved.
+It also accepts custom v2 packs such as the bundled project companion **Byte**: an 8-column by 11-row atlas at 1536 × 2288 pixels with `spriteVersionNumber: 2`, `displayName`, and 16 look directions. Task Companion supports all v2 rows: idle, directional dragging, waving, jumping, failed, waiting, running, review, and the 16 clockwise cursor-look poses. Per-frame v2 durations are preserved.
 
 Status mapping and fallback order:
 
@@ -82,7 +82,7 @@ Create a 1536 × 1872 WebP atlas with 8 frames per row. Rows 0–4 represent `id
 
 ## Assets, rights, and affiliation
 
-OpenCode includes the user-created Molebyte example with the creator's permission and no separate public license. Its provenance is recorded beside the asset. Other imported assets come from the user. A missing license is displayed as **License not specified** and is never treated as permission to reuse an asset.
+OpenCode includes Byte, artwork created specifically for this project with the creator's permission and no separate public license. Its provenance is recorded beside the asset. Other imported assets come from the user. A missing license is displayed as **License not specified** and is never treated as permission to reuse an asset.
 
 OpenCode can import compatible custom companion packages created for other applications. OpenCode does not include or distribute third-party companion assets and is not affiliated with or endorsed by OpenAI. Users are responsible for ensuring that imported assets may legally be used.
 

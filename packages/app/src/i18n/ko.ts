@@ -9,8 +9,6 @@ export const dict = {
   "settings.companion.mode.disabled": "사용 안 함",
   "settings.companion.mode.orbit": "동반자 아이콘",
   "settings.companion.mode.animated": "움직이는 동반자",
-  "settings.companion.show.title": "동반자 표시",
-  "settings.companion.show.description": "동반자 옆에 활성 세션을 표시합니다.",
   "settings.companion.animations.title": "동반자 애니메이션",
   "settings.companion.animations.description": "작업이 진행 중일 때 동반자를 움직입니다.",
   "settings.companion.size.title": "동반자 크기",

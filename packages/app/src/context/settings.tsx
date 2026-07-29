@@ -21,11 +21,9 @@ export interface SoundSettings {
 
 export interface Settings {
   companion: {
-    enabled: boolean
     animations: boolean
     mode?: "disabled" | "orbit" | "animated"
     scale?: number
-    showCompletedForSeconds?: number
     position?: { x: number; y: number }
   }
   general: {
@@ -184,11 +182,9 @@ export function terminalFontFamily(font: string | undefined) {
 
 const defaultSettings: Settings = {
   companion: {
-    enabled: true,
     animations: true,
     mode: "animated",
     scale: 1,
-    showCompletedForSeconds: 8,
   },
   general: {
     autoSave: true,
@@ -228,12 +224,6 @@ const defaultSettings: Settings = {
     errorsEnabled: true,
     errors: "nope-03",
   },
-}
-
-export function resolveCompanionMode(enabled: boolean, mode: Settings["companion"]["mode"]) {
-  if (!enabled) return "disabled" as const
-  if (!mode || mode === "disabled") return defaultSettings.companion.mode!
-  return mode
 }
 
 function withFallback<T>(read: () => T | undefined, fallback: T) {
@@ -367,21 +357,9 @@ export const { use: useSettings, provider: SettingsProvider } = createSimpleCont
         return store
       },
       companion: {
-        enabled: withFallback(() => store.companion?.enabled, defaultSettings.companion.enabled),
-        setEnabled(value: boolean) {
-          setStore("companion", "enabled", value)
-          if (value && store.companion?.mode === "disabled")
-            setStore("companion", "mode", defaultSettings.companion.mode)
-        },
-        mode: createMemo(() =>
-          resolveCompanionMode(
-            store.companion?.enabled ?? defaultSettings.companion.enabled,
-            store.companion?.mode,
-          ),
-        ),
+        mode: withFallback(() => store.companion?.mode, defaultSettings.companion.mode!),
         setMode(value: "disabled" | "orbit" | "animated") {
           setStore("companion", "mode", value)
-          setStore("companion", "enabled", value !== "disabled")
         },
         animations: withFallback(() => store.companion?.animations, defaultSettings.companion.animations),
         setAnimations(value: boolean) {
@@ -391,10 +369,6 @@ export const { use: useSettings, provider: SettingsProvider } = createSimpleCont
         setScale(value: number) {
           setStore("companion", "scale", Math.min(1.6, Math.max(0.6, value)))
         },
-        showCompletedForSeconds: withFallback(
-          () => store.companion?.showCompletedForSeconds,
-          defaultSettings.companion.showCompletedForSeconds!,
-        ),
         position: () => store.companion?.position,
         setPosition(value: { x: number; y: number }) {
           setStore("companion", "position", value)

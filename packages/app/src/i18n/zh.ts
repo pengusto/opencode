@@ -13,8 +13,6 @@ export const dict = {
   "settings.companion.mode.disabled": "已禁用",
   "settings.companion.mode.orbit": "伙伴图标",
   "settings.companion.mode.animated": "动画伙伴",
-  "settings.companion.show.title": "显示伙伴",
-  "settings.companion.show.description": "在伙伴旁显示活动会话。",
   "settings.companion.animations.title": "伙伴动画",
   "settings.companion.animations.description": "任务活动时播放伙伴动画。",
   "settings.companion.size.title": "伙伴大小",

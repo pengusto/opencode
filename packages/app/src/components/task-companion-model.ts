@@ -13,9 +13,7 @@ export type CompanionSession = {
   title: string
   directory: string
   state: CompanionState
-  startedAt: number
   updatedAt: number
-  runningTools: number
 }
 
 export type CompanionOverlaySnapshot = {

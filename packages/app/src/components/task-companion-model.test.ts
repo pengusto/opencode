@@ -43,9 +43,7 @@ describe("task companion", () => {
       state,
       title: id,
       directory: "/tmp",
-      startedAt: 1,
       updatedAt: 1,
-      runningTools: 0,
     })
     expect(sortCompanionSessions([session("busy", "working"), session("ask", "waiting_for_user")])[0]?.id).toBe("ask")
     expect(

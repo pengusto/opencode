@@ -9,8 +9,6 @@ export const dict = {
   "settings.companion.mode.disabled": "Deaktiveret",
   "settings.companion.mode.orbit": "Ledsagerikon",
   "settings.companion.mode.animated": "Animeret ledsager",
-  "settings.companion.show.title": "Vis ledsager",
-  "settings.companion.show.description": "Vis aktive sessioner ved siden af ledsageren.",
   "settings.companion.animations.title": "Ledsageranimationer",
   "settings.companion.animations.description": "Animér ledsageren, mens opgaver er aktive.",
   "settings.companion.size.title": "Ledsagerstørrelse",

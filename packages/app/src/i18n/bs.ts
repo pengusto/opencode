@@ -9,8 +9,6 @@ export const dict = {
   "settings.companion.mode.disabled": "Onemogućeno",
   "settings.companion.mode.orbit": "Ikona pratioca",
   "settings.companion.mode.animated": "Animirani pratilac",
-  "settings.companion.show.title": "Prikaži pratioca",
-  "settings.companion.show.description": "Prikaži aktivne sesije pored pratioca.",
   "settings.companion.animations.title": "Animacije pratioca",
   "settings.companion.animations.description": "Animiraj pratioca dok su zadaci aktivni.",
   "settings.companion.size.title": "Veličina pratioca",

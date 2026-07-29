@@ -35,18 +35,12 @@ const Controls: Component<{ v2?: boolean }> = (props) => {
             </select>
           </Row>
           <Row
-            title={language.t("settings.companion.show.title")}
-            description={language.t("settings.companion.show.description")}
-          >
-            <Switch checked={settings.companion.enabled()} onChange={settings.companion.setEnabled} />
-          </Row>
-          <Row
             title={language.t("settings.companion.animations.title")}
             description={language.t("settings.companion.animations.description")}
           >
             <Switch
               checked={settings.companion.animations()}
-              disabled={!settings.companion.enabled()}
+              disabled={settings.companion.mode() === "disabled"}
               onChange={settings.companion.setAnimations}
             />
           </Row>

@@ -12,8 +12,6 @@ export const dict = {
   "settings.companion.mode.disabled": "Deaktivert",
   "settings.companion.mode.orbit": "Følgesvennikon",
   "settings.companion.mode.animated": "Animert følgesvenn",
-  "settings.companion.show.title": "Vis følgesvenn",
-  "settings.companion.show.description": "Vis aktive økter ved siden av følgesvennen.",
   "settings.companion.animations.title": "Følgesvennanimasjoner",
   "settings.companion.animations.description": "Animer følgesvennen mens oppgaver er aktive.",
   "settings.companion.size.title": "Størrelse på følgesvenn",

@@ -9,8 +9,6 @@ export const dict = {
   "settings.companion.mode.disabled": "معطّل",
   "settings.companion.mode.orbit": "أيقونة الرفيق",
   "settings.companion.mode.animated": "رفيق متحرك",
-  "settings.companion.show.title": "إظهار الرفيق",
-  "settings.companion.show.description": "إظهار الجلسات النشطة بجوار الرفيق.",
   "settings.companion.animations.title": "حركات الرفيق",
   "settings.companion.animations.description": "تحريك الرفيق أثناء وجود مهام نشطة.",
   "settings.companion.size.title": "حجم الرفيق",

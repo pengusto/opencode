@@ -1,7 +1,7 @@
 {
-  "id": "molebyte",
-  "displayName": "Molebyte",
-  "description": "Ein lila Retro-Tech-Maulwurf mit Arbeitsbrille, Pixel-Power und einem scharfen Blick für jedes Detail.",
+  "id": "byte",
+  "displayName": "Byte",
+  "description": "A living terminal cursor built for OpenCode that communicates task state through compact geometric motion.",
   "spriteVersionNumber": 2,
   "spritesheetPath": "spritesheet.webp",
   "format": "lossless-webp",

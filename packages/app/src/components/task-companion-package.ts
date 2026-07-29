@@ -85,40 +85,34 @@ function validatePaths(input: CompanionPackageInput) {
   if (input.files.some((item) => !safePath(item.name))) throw new Error("Companion Pack contains an unsafe path")
 }
 
-export class LegacyAtlasCompanionAdapter {
-  detect(input: CompanionPackageInput) {
-    return !!file(input, "pet.json") && !!file(input, "spritesheet.webp")
-  }
-
-  load(input: CompanionPackageInput): LoadedCompanion {
-    validatePaths(input)
-    const manifest = json(input, "pet.json")
-    const atlas = image(input, "spritesheet.webp")
-    const version = manifest.spriteVersionNumber === 2 ? legacyV2 : legacy
-    if (atlas.width !== version.width || atlas.height !== version.height)
-      throw new Error(
-        `spritesheet.webp must be ${legacy.width} × ${legacy.height} pixels or ${legacyV2.width} × ${legacyV2.height} pixels for v2`,
-      )
-    const id =
-      typeof manifest.id === "string" && /^[a-z0-9][a-z0-9-]{0,63}$/.test(manifest.id)
-        ? manifest.id
-        : "imported-companion"
-    return {
-      id,
-      name:
-        typeof manifest.displayName === "string"
-          ? manifest.displayName.slice(0, 80)
-          : typeof manifest.name === "string"
-            ? manifest.name.slice(0, 80)
-            : "Imported Companion",
-      author: typeof manifest.author === "string" ? manifest.author.slice(0, 120) : undefined,
-      license: typeof manifest.license === "string" ? manifest.license.slice(0, 80) : undefined,
-      source:
-        typeof manifest.source === "string" && manifest.source.startsWith("https://") ? manifest.source : undefined,
-      format: version.rows === 11 ? "legacy-8x11-atlas" : "legacy-8x9-atlas",
-      image: atlas,
-      animations:
-        version.rows === 11
+export function loadLegacyAtlas(input: CompanionPackageInput): LoadedCompanion {
+  validatePaths(input)
+  const manifest = json(input, "pet.json")
+  const atlas = image(input, "spritesheet.webp")
+  const version = manifest.spriteVersionNumber === 2 ? legacyV2 : legacy
+  if (atlas.width !== version.width || atlas.height !== version.height)
+    throw new Error(
+      `spritesheet.webp must be ${legacy.width} × ${legacy.height} pixels or ${legacyV2.width} × ${legacyV2.height} pixels for v2`,
+    )
+  const id =
+    typeof manifest.id === "string" && /^[a-z0-9][a-z0-9-]{0,63}$/.test(manifest.id)
+      ? manifest.id
+      : "imported-companion"
+  return {
+    id,
+    name:
+      typeof manifest.displayName === "string"
+        ? manifest.displayName.slice(0, 80)
+        : typeof manifest.name === "string"
+          ? manifest.name.slice(0, 80)
+          : "Imported Companion",
+    author: typeof manifest.author === "string" ? manifest.author.slice(0, 120) : undefined,
+    license: typeof manifest.license === "string" ? manifest.license.slice(0, 80) : undefined,
+    source: typeof manifest.source === "string" && manifest.source.startsWith("https://") ? manifest.source : undefined,
+    format: version.rows === 11 ? "legacy-8x11-atlas" : "legacy-8x9-atlas",
+    image: atlas,
+    animations:
+      version.rows === 11
           ? {
               idle: { row: 0, frames: 6, fps: 6, loop: true, durations: [280, 110, 110, 140, 140, 320] },
               "running-right": {
@@ -165,9 +159,8 @@ export class LegacyAtlasCompanionAdapter {
               celebrate: { row: 3, frames: legacy.columns, fps: 12, loop: false },
               error: { row: 4, frames: legacy.columns, fps: 8, loop: false },
             },
-      warnings: [],
-      atlas: version,
-    }
+    warnings: [],
+    atlas: version,
   }
 }
 
