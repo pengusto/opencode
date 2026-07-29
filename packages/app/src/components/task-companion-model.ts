@@ -8,6 +8,8 @@ export type CompanionState =
   | "failed"
   | "cancelled"
 
+export type CompanionPet = "orbit" | "byte" | "molebyte"
+
 export type CompanionSession = {
   id: string
   title: string
@@ -18,7 +20,7 @@ export type CompanionSession = {
 
 export type CompanionOverlaySnapshot = {
   visible: boolean
-  mode: "orbit" | "animated"
+  pet: CompanionPet
   animations: boolean
   scale: number
   leadState: CompanionState

@@ -3,6 +3,7 @@ import { createEffect, createMemo, createSignal, onCleanup } from "solid-js"
 import { createSimpleContext } from "@opencode-ai/ui/context"
 import { persisted } from "@/utils/persist"
 import { usePlatform } from "@/context/platform"
+import type { CompanionPet } from "../components/task-companion-model"
 
 export interface NotificationSettings {
   agent: boolean
@@ -21,8 +22,9 @@ export interface SoundSettings {
 
 export interface Settings {
   companion: {
+    enabled: boolean
     animations: boolean
-    mode?: "disabled" | "orbit" | "animated"
+    pet?: CompanionPet
     scale?: number
     position?: { x: number; y: number }
   }
@@ -182,8 +184,9 @@ export function terminalFontFamily(font: string | undefined) {
 
 const defaultSettings: Settings = {
   companion: {
+    enabled: true,
     animations: true,
-    mode: "animated",
+    pet: "byte",
     scale: 1,
   },
   general: {
@@ -357,9 +360,16 @@ export const { use: useSettings, provider: SettingsProvider } = createSimpleCont
         return store
       },
       companion: {
-        mode: withFallback(() => store.companion?.mode, defaultSettings.companion.mode!),
-        setMode(value: "disabled" | "orbit" | "animated") {
-          setStore("companion", "mode", value)
+        enabled: withFallback(() => store.companion?.enabled, defaultSettings.companion.enabled),
+        setEnabled(value: boolean) {
+          setStore("companion", "enabled", value)
+        },
+        pet: createMemo(() => {
+          const pet = store.companion?.pet
+          return pet === "orbit" || pet === "molebyte" ? pet : "byte"
+        }),
+        setPet(value: CompanionPet) {
+          setStore("companion", "pet", value)
         },
         animations: withFallback(() => store.companion?.animations, defaultSettings.companion.animations),
         setAnimations(value: boolean) {

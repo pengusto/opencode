@@ -33,7 +33,7 @@ export function parseCompanionSnapshot(value: unknown): CompanionOverlaySnapshot
   if (!value || typeof value !== "object" || Array.isArray(value)) return
   const input = value as Record<string, unknown>
   if (typeof input.visible !== "boolean") return
-  if (input.mode !== "orbit" && input.mode !== "animated") return
+  if (input.pet !== "orbit" && input.pet !== "byte" && input.pet !== "molebyte") return
   if (typeof input.animations !== "boolean") return
   if (typeof input.scale !== "number" || input.scale < 0.6 || input.scale > 1.6) return
   if (typeof input.leadState !== "string" || !states.has(input.leadState as CompanionState)) return
@@ -71,7 +71,7 @@ export function parseCompanionSnapshot(value: unknown): CompanionOverlaySnapshot
 
   return {
     visible: input.visible,
-    mode: input.mode,
+    pet: input.pet,
     animations: input.animations,
     scale: input.scale,
     leadState: input.leadState as CompanionState,

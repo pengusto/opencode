@@ -1,10 +1,11 @@
-import type { Component, JSX } from "solid-js"
+import { For, type Component, type JSX } from "solid-js"
 import { Switch } from "@opencode-ai/ui/switch"
 import { useSettings } from "@/context/settings"
 import { useLanguage } from "@/context/language"
 import { SettingsList } from "./settings-list"
 import { SettingsListV2 } from "./settings-v2/parts/list"
 import { SettingsRowV2 } from "./settings-v2/parts/row"
+import { companionCatalog } from "./task-companion-renderer"
 
 const Controls: Component<{ v2?: boolean }> = (props) => {
   const settings = useSettings()
@@ -17,22 +18,44 @@ const Controls: Component<{ v2?: boolean }> = (props) => {
       <h2 class="text-16-medium text-text-strong pb-2">{language.t("settings.companion.title")}</h2>
       <div class="rounded-lg border border-border-weak-base overflow-hidden">
         <List>
+          <Row title={language.t("settings.companion.mode.title")} description={language.t("settings.companion.mode.description")}>
+            <div class="grid grid-cols-3 gap-2 w-[280px] max-w-full">
+              <For each={companionCatalog}>
+                {(pet) => (
+                  <button
+                    type="button"
+                    class="min-w-0 rounded-lg border px-2 py-2 flex flex-col items-center gap-1.5 text-11-medium focus-visible:outline-2"
+                    classList={{
+                      "border-border-selected bg-surface-raised-base": settings.companion.pet() === pet.id,
+                      "border-border-weak-base hover:bg-surface-raised-base-hover": settings.companion.pet() !== pet.id,
+                    }}
+                    aria-pressed={settings.companion.pet() === pet.id}
+                    onClick={() => settings.companion.setPet(pet.id)}
+                  >
+                    {pet.spritesheet ? (
+                      <span
+                        aria-hidden="true"
+                        class="block w-12 h-[52px] bg-no-repeat"
+                        style={{
+                          "background-image": `url(${pet.spritesheet})`,
+                          "background-size": "384px 572px",
+                          "image-rendering": "pixelated",
+                        }}
+                      />
+                    ) : (
+                      <span aria-hidden="true" class="w-12 h-[52px] flex items-center justify-center text-24-medium">◉</span>
+                    )}
+                    <span class="truncate max-w-full">{pet.name}</span>
+                  </button>
+                )}
+              </For>
+            </div>
+          </Row>
           <Row
-            title={language.t("settings.companion.mode.title")}
-            description={language.t("settings.companion.mode.description")}
+            title={language.t("settings.companion.show.title")}
+            description={language.t("settings.companion.show.description")}
           >
-            <select
-              class="rounded border border-border-base bg-background-base px-2 py-1 text-12-regular"
-              value={settings.companion.mode()}
-              onChange={(event) => {
-                const mode = event.currentTarget.value
-                if (mode === "disabled" || mode === "orbit" || mode === "animated") settings.companion.setMode(mode)
-              }}
-            >
-              <option value="disabled">{language.t("settings.companion.mode.disabled")}</option>
-              <option value="orbit">{language.t("settings.companion.mode.orbit")}</option>
-              <option value="animated">{language.t("settings.companion.mode.animated")}</option>
-            </select>
+            <Switch checked={settings.companion.enabled()} onChange={settings.companion.setEnabled} />
           </Row>
           <Row
             title={language.t("settings.companion.animations.title")}
@@ -40,7 +63,7 @@ const Controls: Component<{ v2?: boolean }> = (props) => {
           >
             <Switch
               checked={settings.companion.animations()}
-              disabled={settings.companion.mode() === "disabled"}
+              disabled={!settings.companion.enabled()}
               onChange={settings.companion.setAnimations}
             />
           </Row>

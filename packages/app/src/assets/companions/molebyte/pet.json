@@ -1,0 +1,32 @@
+{
+  "id": "molebyte",
+  "displayName": "Molebyte",
+  "description": "Ein lila Retro-Tech-Maulwurf mit Arbeitsbrille, Pixel-Power und einem scharfen Blick für jedes Detail.",
+  "spriteVersionNumber": 2,
+  "spritesheetPath": "spritesheet.webp",
+  "format": "lossless-webp",
+  "width": 1536,
+  "height": 2288,
+  "columns": 8,
+  "rows": 11,
+  "cellWidth": 192,
+  "cellHeight": 208,
+  "lookDirections": [
+    "N",
+    "NNE",
+    "NE",
+    "ENE",
+    "E",
+    "ESE",
+    "SE",
+    "SSE",
+    "S",
+    "SSW",
+    "SW",
+    "WSW",
+    "W",
+    "WNW",
+    "NW",
+    "NNW"
+  ]
+}

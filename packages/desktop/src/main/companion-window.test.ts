@@ -9,7 +9,7 @@ import {
 
 const snapshot = {
   visible: true,
-  mode: "animated",
+  pet: "molebyte",
   animations: true,
   scale: 1,
   leadState: "working",
@@ -33,6 +33,7 @@ const snapshot = {
 describe("companion window", () => {
   test("accepts the narrow overlay payload and rejects invalid navigation", () => {
     expect(parseCompanionSnapshot(snapshot)).toEqual(snapshot)
+    expect(parseCompanionSnapshot({ ...snapshot, pet: "unknown" })).toBeUndefined()
     expect(
       parseCompanionSnapshot({
         ...snapshot,

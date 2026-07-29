@@ -25,7 +25,7 @@ import {
   type CompanionAnimationName,
   type LoadedCompanion,
 } from "./task-companion-package"
-import { loadBundledByte, TaskCompanionSprite } from "./task-companion-renderer"
+import { loadBundledCompanion, TaskCompanionSprite } from "./task-companion-renderer"
 import "./task-companion.css"
 
 const symbol = {
@@ -104,9 +104,18 @@ export function TaskCompanion() {
       document.documentElement.removeEventListener("mouseleave", clearLook)
       clearTimeout(greeting)
     })
-    void loadBundledByte()
-      .then(setCompanion)
-      .catch((error) => setImportError(error instanceof Error ? error.message : "Byte could not be loaded"))
+  })
+
+  createEffect(() => {
+    const pet = settings.companion.pet()
+    if (pet === "orbit") return setCompanion()
+    let active = true
+    void loadBundledCompanion(pet)
+      .then((companion) => active && setCompanion(companion))
+      .catch((error) => active && setImportError(error instanceof Error ? error.message : "Companion could not be loaded"))
+    onCleanup(() => {
+      active = false
+    })
   })
 
   onCleanup(
@@ -189,8 +198,8 @@ export function TaskCompanion() {
     if (!platform.companionOverlay) return
     const active = lead()
     platform.companionOverlay.publish({
-      visible: settings.companion.mode() !== "disabled",
-      mode: settings.companion.mode() === "animated" ? "animated" : "orbit",
+      visible: settings.companion.enabled(),
+      pet: settings.companion.pet(),
       animations: settings.companion.animations(),
       scale: settings.companion.scale(),
       leadState: active?.state ?? "idle",
@@ -267,7 +276,6 @@ export function TaskCompanion() {
     try {
       const input = await companionInput([...files])
       setCompanion(loadLegacyAtlas(input))
-      settings.companion.setMode("animated")
     } catch (error) {
       setImportError(error instanceof Error ? error.message : "Companion Pack could not be imported")
     } finally {
@@ -276,7 +284,7 @@ export function TaskCompanion() {
   }
 
   return (
-    <Show when={settings.companion.mode() !== "disabled" && !platform.companionOverlay}>
+    <Show when={settings.companion.enabled() && !platform.companionOverlay}>
       <div
         ref={root}
         class="fixed z-[9999] touch-none"
@@ -370,7 +378,7 @@ export function TaskCompanion() {
             }}
           >
             <Show
-              when={settings.companion.mode() === "animated" && companion()}
+              when={settings.companion.pet() !== "orbit" && companion()}
               fallback={
                 <span
                   aria-hidden="true"
@@ -404,7 +412,7 @@ export function TaskCompanion() {
               <button
                 class="text-11-regular underline"
                 type="button"
-                onClick={() => settings.companion.setMode("orbit")}
+                onClick={() => settings.companion.setPet("orbit")}
               >
                 Orbit Mode
               </button>
@@ -428,9 +436,6 @@ export function TaskCompanion() {
                   <div class="text-text-strong">{item().name}</div>
                   <div>{item().author ?? "Author not specified"}</div>
                   <div>{item().license ?? "License not specified"}</div>
-                  <button type="button" class="mt-1 underline" onClick={() => settings.companion.setMode("animated")}>
-                    Use Companion
-                  </button>
                 </div>
               )}
             </Show>

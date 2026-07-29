@@ -11,7 +11,7 @@ import { render } from "solid-js/web"
 import { createStore } from "solid-js/store"
 import {
   companionAnimation,
-  loadBundledMolebyte,
+  loadBundledCompanion,
   TaskCompanionSprite,
   type CompanionAnimationName,
   type LoadedCompanion,
@@ -135,6 +135,11 @@ function Companion() {
 
   onMount(() => {
     const unsubscribe = window.companion.onSnapshot((snapshot) => {
+      if (snapshot.pet === "orbit") setState("companion", undefined)
+      if (snapshot.pet !== "orbit" && snapshot.pet !== state.snapshot?.pet)
+        void loadBundledCompanion(snapshot.pet)
+          .then((companion) => state.snapshot?.pet === snapshot.pet && setState("companion", companion))
+          .catch(() => {})
       for (const session of snapshot.sessions) {
         if (!state.dismissed[session.id] || session.state === "completed" || session.state === "idle") continue
         setState("dismissed", session.id, undefined)
@@ -170,9 +175,6 @@ function Companion() {
       clearTimeout(greeting)
     })
 
-    void loadBundledMolebyte()
-      .then((companion) => setState("companion", companion))
-      .catch(() => {})
   })
 
   return (
@@ -269,7 +271,7 @@ function Companion() {
           }}
         >
           <Show
-            when={state.snapshot?.mode === "animated" && state.companion}
+            when={state.snapshot?.pet !== "orbit" && state.companion}
             fallback={
               <span class="companion-orbit" aria-label={state.snapshot?.leadState ?? "idle"}>
                 <span class="companion-face" aria-hidden="true"><i /><i /><b /></span>
