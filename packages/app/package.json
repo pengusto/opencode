@@ -9,6 +9,7 @@
     "./updater": "./src/updater.ts",
     "./task-companion": "./src/components/task-companion-model.ts",
     "./task-companion-renderer": "./src/components/task-companion-renderer.ts",
+    "./task-companion-library": "./src/components/task-companion-library.ts",
     "./task-companion.css": "./src/components/task-companion.css",
     "./wsl/types": "./src/wsl/types.ts",
     "./vite": "./vite.js",

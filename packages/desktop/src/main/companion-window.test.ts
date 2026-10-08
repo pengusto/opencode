@@ -33,7 +33,8 @@ const snapshot = {
 describe("companion window", () => {
   test("accepts the narrow overlay payload and rejects invalid navigation", () => {
     expect(parseCompanionSnapshot(snapshot)).toEqual(snapshot)
-    expect(parseCompanionSnapshot({ ...snapshot, pet: "unknown" })).toBeUndefined()
+    expect(parseCompanionSnapshot({ ...snapshot, pet: "custom-pet" })?.pet).toBe("custom-pet")
+    expect(parseCompanionSnapshot({ ...snapshot, pet: "../unknown" })).toBeUndefined()
     expect(
       parseCompanionSnapshot({
         ...snapshot,

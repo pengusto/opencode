@@ -3,7 +3,7 @@ import { createEffect, createMemo, createSignal, onCleanup } from "solid-js"
 import { createSimpleContext } from "@opencode-ai/ui/context"
 import { persisted } from "@/utils/persist"
 import { usePlatform } from "@/context/platform"
-import type { CompanionPet } from "../components/task-companion-model"
+import { validCompanionPetID, type CompanionPet } from "../components/task-companion-model"
 
 export interface NotificationSettings {
   agent: boolean
@@ -366,7 +366,7 @@ export const { use: useSettings, provider: SettingsProvider } = createSimpleCont
         },
         pet: createMemo(() => {
           const pet = store.companion?.pet
-          return pet === "orbit" || pet === "molebyte" ? pet : "byte"
+          return validCompanionPetID(pet) ? pet : "byte"
         }),
         setPet(value: CompanionPet) {
           setStore("companion", "pet", value)

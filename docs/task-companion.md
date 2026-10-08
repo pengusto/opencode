@@ -18,7 +18,7 @@ Settings show all bundled companions as selectable cards:
 - **Byte** uses the compact terminal-cursor companion.
 - **Molebyte** uses the purple retro-tech mole companion.
 
-The separate **Show companion** switch controls visibility without changing the selected pet. Animation and size remain independent settings.
+The separate **Show companion** switch controls visibility without changing the selected pet. Animation and size remain independent settings. Imported pets are stored locally, appear beside bundled pets after reload, and can be removed from the catalog.
 
 Open the lower-right companion with pointer or keyboard. Sessions requiring action sort first; selecting one opens that session. Completed sessions remain visible until their green status circle is hovered into an X and dismissed. Failure and cancellation remain visible for eight seconds. Settings use the existing `settings.v3` store.
 
@@ -68,7 +68,7 @@ Imports are treated as untrusted data. The importer:
 - restricts IDs and truncates display metadata;
 - accepts only HTTPS source metadata and never opens it automatically.
 
-The browser directory picker does not expose symlink targets. Packs currently remain in renderer memory and disappear after reload; no untrusted file is copied outside the picker sandbox.
+The browser directory picker does not expose symlink targets. Validated packs are stored in the local IndexedDB companion library; no untrusted file is copied outside the browser storage sandbox.
 
 ## Creating a pack
 

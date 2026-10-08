@@ -10,10 +10,16 @@ import {
   companionRunningTools,
   companionState,
   sortCompanionSessions,
+  validCompanionPetID,
   type CompanionSession,
 } from "./task-companion-model"
 
 describe("task companion", () => {
+  test("accepts safe catalog IDs", () => {
+    expect(validCompanionPetID("custom-pet")).toBe(true)
+    expect(validCompanionPetID("../custom-pet")).toBe(false)
+    expect(validCompanionPetID("custom pet")).toBe(false)
+  })
   test("flips cards only when their current side reaches the display edge", () => {
     expect(companionCardsBelow(false, { top: 100, bottom: 204 }, { top: 0, bottom: 900 })).toBe(true)
     expect(companionCardsBelow(true, { top: 400, bottom: 504 }, { top: 0, bottom: 900 })).toBe(true)

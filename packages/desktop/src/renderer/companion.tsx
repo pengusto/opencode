@@ -11,11 +11,13 @@ import { render } from "solid-js/web"
 import { createStore } from "solid-js/store"
 import {
   companionAnimation,
+  isBundledCompanion,
   loadBundledCompanion,
   TaskCompanionSprite,
   type CompanionAnimationName,
   type LoadedCompanion,
 } from "@opencode-ai/app/task-companion-renderer"
+import { loadStoredCompanion } from "@opencode-ai/app/task-companion-library"
 import "./companion.css"
 
 const symbols = {
@@ -137,7 +139,9 @@ function Companion() {
     const unsubscribe = window.companion.onSnapshot((snapshot) => {
       if (snapshot.pet === "orbit") setState("companion", undefined)
       if (snapshot.pet !== "orbit" && snapshot.pet !== state.snapshot?.pet)
-        void loadBundledCompanion(snapshot.pet)
+        void (isBundledCompanion(snapshot.pet)
+          ? loadBundledCompanion(snapshot.pet)
+          : loadStoredCompanion(snapshot.pet))
           .then((companion) => state.snapshot?.pet === snapshot.pet && setState("companion", companion))
           .catch(() => {})
       for (const session of snapshot.sessions) {

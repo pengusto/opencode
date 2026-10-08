@@ -20,12 +20,11 @@ import {
 } from "./task-companion-model"
 import {
   companionAnimation,
-  companionInput,
-  loadLegacyAtlas,
   type CompanionAnimationName,
   type LoadedCompanion,
 } from "./task-companion-package"
-import { loadBundledCompanion, TaskCompanionSprite } from "./task-companion-renderer"
+import { importCompanion, loadStoredCompanion } from "./task-companion-library"
+import { isBundledCompanion, loadBundledCompanion, TaskCompanionSprite } from "./task-companion-renderer"
 import "./task-companion.css"
 
 const symbol = {
@@ -108,10 +107,20 @@ export function TaskCompanion() {
 
   createEffect(() => {
     const pet = settings.companion.pet()
-    if (pet === "orbit") return setCompanion()
+    if (pet === "orbit") {
+      setCompanion()
+      return
+    }
     let active = true
-    void loadBundledCompanion(pet)
-      .then((companion) => active && setCompanion(companion))
+    void (isBundledCompanion(pet) ? loadBundledCompanion(pet) : loadStoredCompanion(pet))
+      .then((companion) => {
+        if (!active) return
+        if (companion) {
+          setCompanion(companion)
+          return
+        }
+        settings.companion.setPet("byte")
+      })
       .catch((error) => active && setImportError(error instanceof Error ? error.message : "Companion could not be loaded"))
     onCleanup(() => {
       active = false
@@ -274,8 +283,9 @@ export function TaskCompanion() {
     if (!files?.length) return
     setImportError(undefined)
     try {
-      const input = await companionInput([...files])
-      setCompanion(loadLegacyAtlas(input))
+      const companion = await importCompanion([...files])
+      setCompanion(companion)
+      settings.companion.setPet(companion.id)
     } catch (error) {
       setImportError(error instanceof Error ? error.message : "Companion Pack could not be imported")
     } finally {

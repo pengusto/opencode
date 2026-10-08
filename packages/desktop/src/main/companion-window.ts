@@ -1,4 +1,4 @@
-import type { CompanionOverlaySnapshot, CompanionState } from "@opencode-ai/app/task-companion"
+import { validCompanionPetID, type CompanionOverlaySnapshot, type CompanionState } from "@opencode-ai/app/task-companion"
 
 const states = new Set<CompanionState>([
   "idle",
@@ -33,7 +33,7 @@ export function parseCompanionSnapshot(value: unknown): CompanionOverlaySnapshot
   if (!value || typeof value !== "object" || Array.isArray(value)) return
   const input = value as Record<string, unknown>
   if (typeof input.visible !== "boolean") return
-  if (input.pet !== "orbit" && input.pet !== "byte" && input.pet !== "molebyte") return
+  if (!validCompanionPetID(input.pet)) return
   if (typeof input.animations !== "boolean") return
   if (typeof input.scale !== "number" || input.scale < 0.6 || input.scale > 1.6) return
   if (typeof input.leadState !== "string" || !states.has(input.leadState as CompanionState)) return

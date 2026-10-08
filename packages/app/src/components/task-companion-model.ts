@@ -8,7 +8,11 @@ export type CompanionState =
   | "failed"
   | "cancelled"
 
-export type CompanionPet = "orbit" | "byte" | "molebyte"
+export type CompanionPet = string
+
+export function validCompanionPetID(value: unknown): value is string {
+  return typeof value === "string" && /^[a-z0-9][a-z0-9-]{0,63}$/.test(value)
+}
 
 export type CompanionSession = {
   id: string
